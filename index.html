@@ -6,77 +6,25 @@
     <title>Trigger System Simulator</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            overscroll-behavior: none;
-        }
-        #simulationCanvas {
-            position: relative;
-            overflow: hidden;
-            cursor: grab;
-        }
-        #simulationCanvas.panning {
-            cursor: grabbing;
-        }
-        #zoom-container {
-            width: 100%;
-            height: 100%;
-            transform-origin: 0 0;
-            transition: transform 0.1s linear;
-        }
-        .trigger {
-            transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-            position: absolute;
-            user-select: none;
-            width: 220px; /* Wider to accommodate more text */
-        }
-        .trigger.selected {
-            box-shadow: 0 0 20px rgba(59, 130, 246, 0.9); /* Blue-500 glow */
-            border-color: #3B82F6;
-        }
-        .trigger.active {
-            background-color: #10B981; /* Emerald-500 */
-            border-color: #059669; /* Emerald-600 */
-            color: white;
-        }
-        .trigger.inactive {
-            background-color: #4B5563; /* Gray-600 */
-            border-color: #374151; /* Gray-700 */
-            color: white;
-        }
-        .trigger.pulsing-fire {
-            animation: pulse-fire-animation 0.7s ease-out;
-        }
-        .trigger.pulsing-listen {
-            animation: pulse-listen-animation 0.7s ease-out;
-        }
-        @keyframes pulse-fire-animation {
-            0%, 100% { box-shadow: 0 0 15px rgba(16, 185, 129, 0.5); }
-            50% { box-shadow: 0 0 30px rgba(16, 185, 129, 1); transform: scale(1.05); }
-        }
-        @keyframes pulse-listen-animation {
-            0%, 100% { border-color: inherit; }
-            50% { border-color: #FBBF24; /* Amber-400 */ }
-        }
-        .action-btn {
-            transition: background-color 0.2s;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body class="bg-gray-900 text-gray-200 flex flex-col h-screen">
 
     <header class="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 p-4 shadow-lg flex justify-between items-center z-10">
         <h1 class="text-2xl font-bold text-emerald-400">Trigger Simulator</h1>
-        <div class="flex items-center space-x-2 text-sm text-gray-400">
-            <span>Zoom: Mouse Wheel</span>
-            <span>Pan: Drag</span>
-        </div>
         <button id="reset-button" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">Reset Simulation</button>
     </header>
 
-    <div class="flex flex-1 overflow-hidden">
+    <!-- Top navigation: Home / Docs -->
+    <nav class="bg-gray-800/40 backdrop-blur-sm border-b border-gray-700 px-4 py-2 flex items-center space-x-4">
+        <div class="flex items-center space-x-4">
+            <button id="nav-home" class="text-sm font-medium px-3 py-1 rounded-md bg-emerald-600 text-white">Home</button>
+            <button id="nav-docs" class="text-sm font-medium px-3 py-1 rounded-md text-gray-300 hover:bg-gray-700">Docs</button>
+        </div>
+        <div class="ml-auto text-sm text-gray-400">View: <span id="current-view" class="text-emerald-300 ml-1">Home</span></div>
+    </nav>
+
+    <div class="flex flex-1 overflow-hidden" id="home-view">
         <!-- Control Panel -->
         <aside class="w-96 bg-gray-800 p-4 space-y-6 overflow-y-auto border-r border-gray-700">
             <!-- Add Trigger Section -->
@@ -134,6 +82,90 @@
         </main>
     </div>
 
+    <!-- Docs View (hidden by default) -->
+    <div id="docs-view" class="hidden flex flex-col h-screen overflow-auto bg-gray-900 text-gray-200">
+        <header class="bg-gray-800/50 backdrop-blur-sm border-b border-gray-700 p-4">
+            <h1 class="text-2xl font-bold text-emerald-400">Documentation</h1>
+            <p class="text-sm text-gray-400 mt-1">Quick reference for using the Trigger Simulator</p>
+        </header>
+        <main class="p-6">
+            <section class="mb-6">
+                <h2 class="text-xl font-semibold text-amber-300">Overview</h2>
+                <p class="text-gray-300 mt-2">Use the <strong>Home</strong> view to build trigger systems visually. Use the toolbar(on the left) to add triggers, pulse/send channels, and save/load layouts.</p>
+            </section>
+            <section class="mb-6">
+                <h2 class="text-xl font-semibold text-emerald-300">Adding a Trigger</h2>
+                <p class="text-gray-300 mt-2">To add a trigger, fill out the form in the "Add Trigger" section of the toolbar. The fields are as follows:</p>
+                <ul class="list-disc ml-6 mt-2 text-gray-300">
+                    <li><strong>ID</strong>: Unique identifier for the trigger (e.g., T_A, T_B)</li>
+                    <li><strong>Delay</strong>: Time in seconds before the trigger activates after receiving the activate signal.</li>
+                    <li><strong>Activate On</strong>: Channel name that activates the trigger when pulsed. (Can be a list, "a, b, c".)</li>
+                    <li><strong>Deactivate On</strong>: Channel name that deactivates the trigger when pulsed. (Can be a list, "a, b, c".)</li>
+                    <li><strong>Trigger On</strong>: Channel name that causes the trigger to send its output when pulsed (if active). (Can be a list, "a, b, c".)</li>
+                    <li><strong>When Triggered</strong>: Channel name that this trigger will pulse when it successfully triggers. (Can be a list, "a, b, c".)</li>
+                </ul>
+            </section>
+            <section class="mb-6">
+                <h2 class="text-xl font-semibold text-purple-300">Layout JSON</h2>
+                <p class="text-gray-300 mt-2">Example layout file:</p>
+                <pre class="bg-gray-800 p-4 rounded text-sm text-gray-200 overflow-auto">[
+  {
+    "id": "T_A_MEM",
+    "delay": 0,
+    "activateOn": "A_ON",
+    "deactivateOn": "RESET",
+    "triggerOn": "",
+    "whenTriggered": null,
+    "initialState": true,
+    "x": 50,
+    "y": 100
+  },
+  {
+    "id": "T_B_MEM",
+    "delay": 0,
+    "activateOn": "B_ON",
+    "deactivateOn": "RESET",
+    "triggerOn": "",
+    "whenTriggered": null,
+    "initialState": true,
+    "x": 50,
+    "y": 250
+  },
+  {
+    "id": "T_CHAIN",
+    "delay": 2,
+    "activateOn": "A_ON",
+    "deactivateOn": "RESET",
+    "triggerOn": "B_ON",
+    "whenTriggered": "AND_SUCCESS",
+    "initialState": false,
+    "x": 300,
+    "y": 175
+  },
+  {
+    "id": "T_RESULT",
+    "delay": 0,
+    "activateOn": "AND_SUCCESS",
+    "deactivateOn": "RESET",
+    "triggerOn": "",
+    "whenTriggered": null,
+    "initialState": false,
+    "x": 550,
+    "y": 175
+  }
+]</pre>
+            <p class="text-gray-300 mt-2">Layouts are saved to your computer for you to store. (Cloud saving may be added in the future)</p>
+            </section>
+            <section>
+                <h2 class="text-xl font-semibold text-blue-300">Shortcuts</h2>
+                <ul class="list-disc ml-6 mt-2 text-gray-300">
+                    <li>Zoom: Mouse Wheel</li>
+                    <li>Pan: Drag</li>
+                    <li>Reset: Reset Simulation button</li>
+                </ul>
+            </section>
+        </main>
+    </div>
     <script src="simulator.js"></script>
 </body>
 </html>

@@ -1,0 +1,77 @@
+body {
+    font-family: 'Inter', sans-serif;
+    overscroll-behavior: none;
+}
+
+#simulationCanvas {
+    position: relative;
+    overflow: hidden;
+    cursor: grab;
+}
+
+#simulationCanvas.panning {
+    cursor: grabbing;
+}
+
+#zoom-container {
+    width: 100%;
+    height: 100%;
+    transform-origin: 0 0;
+    transition: transform 0.1s linear;
+}
+
+.trigger {
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    position: absolute;
+    user-select: none;
+    width: 220px;
+}
+
+.trigger.selected {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.9);
+    border-color: #3B82F6;
+}
+
+.trigger.active {
+    background-color: #10B981;
+    border-color: #059669;
+    color: white;
+}
+
+.trigger.inactive {
+    background-color: #4B5563;
+    border-color: #374151;
+    color: white;
+}
+
+.trigger.pulsing-fire {
+    animation: pulse-fire-animation 0.7s ease-out;
+}
+
+.trigger.pulsing-listen {
+    animation: pulse-listen-animation 0.7s ease-out;
+}
+
+@keyframes pulse-fire-animation {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(16, 185, 129, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(16, 185, 129, 1);
+        transform: scale(1.05);
+    }
+}
+
+@keyframes pulse-listen-animation {
+    0%, 100% {
+        border-color: inherit;
+    }
+    50% {
+        border-color: #FBBF24;
+    }
+}
+
+.action-btn {
+    transition: background-color 0.2s;
+}

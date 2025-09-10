@@ -498,3 +498,41 @@ window.addEventListener('load', () => {
     simulator.addTrigger({ id: 'T_RESULT', activateOn: 'AND_SUCCESS', deactivateOn: 'RESET', x: 550, y: 175 });
     simulator.logEvent("AND Gate loaded. Pulse 'RESET', then 'A_ON', then 'B_ON' to test.");
 });
+
+// --- UI: View toggle for Home / Docs (moved from index.html) ---
+document.addEventListener('DOMContentLoaded', () => {
+    // Defensive: elements may not exist if index.html layout changes
+    const homeBtn = document.getElementById('nav-home');
+    const docsBtn = document.getElementById('nav-docs');
+    const homeView = document.getElementById('home-view');
+    const docsView = document.getElementById('docs-view');
+    const currentView = document.getElementById('current-view');
+
+    if (!homeBtn || !docsBtn || !homeView || !docsView || !currentView) return;
+
+    function showHome(){
+        homeView.classList.remove('hidden');
+        docsView.classList.add('hidden');
+        homeBtn.classList.add('bg-emerald-600', 'text-white');
+        homeBtn.classList.remove('text-gray-300');
+        docsBtn.classList.remove('bg-emerald-600', 'text-white');
+        docsBtn.classList.add('text-gray-300');
+        currentView.textContent = 'Home';
+    }
+
+    function showDocs(){
+        docsView.classList.remove('hidden');
+        homeView.classList.add('hidden');
+        docsBtn.classList.add('bg-emerald-600', 'text-white');
+        docsBtn.classList.remove('text-gray-300');
+        homeBtn.classList.remove('bg-emerald-600', 'text-white');
+        homeBtn.classList.add('text-gray-300');
+        currentView.textContent = 'Docs';
+    }
+
+    homeBtn.addEventListener('click', showHome);
+    docsBtn.addEventListener('click', showDocs);
+
+    // initialize
+    showHome();
+});
